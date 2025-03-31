@@ -1,0 +1,38 @@
+package com.TicketingSystem.Ticketing.Controllers;
+
+import com.TicketingSystem.Ticketing.Entities.ConfigEntity;
+import com.TicketingSystem.Ticketing.Services.EntityService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/config")
+@CrossOrigin(origins = "http://localhost:4200")
+public class EntityController {
+
+    private final EntityService configService;
+
+    @Autowired
+    public EntityController(EntityService configService) {
+        this.configService = configService;
+    }
+
+    // Endpoint to load the current configuration from the database
+    @GetMapping("/get")
+    public ResponseEntity<ConfigEntity> getConfig() {
+        ConfigEntity config = configService.loadConfig();
+        return ResponseEntity.ok(config);
+    }
+
+    // Endpoint to set the configuration values and overwrite the existing data in the DB
+    @PostMapping("/set")
+    public ResponseEntity<String> setConfig(@RequestBody ConfigEntity newConfig) {
+        try {
+            configService.saveConfig(newConfig);
+            return ResponseEntity.ok("Configuration updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error saving updated configuration: " + e.getMessage());
+        }
+    }
+}

@@ -1,0 +1,31 @@
+package com.TicketingSystem.Ticketing.Services;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Vendor implements Runnable {
+    private final TicketPool ticketPool;
+    private final int totalTickets;
+    private final long releaseRate;
+
+    @Autowired
+    public Vendor(TicketPool ticketPool, int releaseCapacity, long releaseRate) {
+        this.ticketPool = ticketPool;
+        this.totalTickets = releaseCapacity;
+        this.releaseRate = releaseRate;
+    }
+
+    @Override
+    public void run() {
+        while (ticketPool.isVendorActive()) {
+            ticketPool.addTickets(totalTickets);
+            try {
+                Thread.sleep(releaseRate);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+    }
+}
